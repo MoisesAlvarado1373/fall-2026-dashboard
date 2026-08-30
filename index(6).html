@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fall 2026 Command Center</title>
+<style>
+  :root{
+    --navy:#0b1f33; --navy2:#153a5b; --orange:#f15a22; --paper:#f5f7fb; --card:#ffffff;
+    --text:#142033; --muted:#65758b; --line:#dbe3ec; --shadow:0 12px 30px rgba(14,34,54,.10);
+    --me:#f59e0b; --stat:#2563eb; --lin:#7c3aed; --multi:#0f9f8f; --phy:#dc3545; --lab:#2e8b57;
+  }
+  *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--text)}
+  button,input,select{font:inherit}
+  .hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:white;padding:30px 22px 26px;position:sticky;top:0;z-index:20;box-shadow:0 7px 20px rgba(0,0,0,.18)}
+  .hero-inner{max-width:1280px;margin:auto;display:flex;gap:24px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .title h1{margin:0 0 4px;font-size:clamp(26px,4vw,42px);letter-spacing:-.03em}.title p{margin:0;color:#cbd9e6}
+  .hero-actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}.btn.primary{background:var(--orange);color:white}.btn.light{background:white;color:var(--navy)}.btn.ghost{background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.25)}
+  main{max-width:1280px;margin:0 auto;padding:22px}
+  .notice{background:#fff8e7;border:1px solid #f5d896;border-left:5px solid var(--me);padding:14px 16px;border-radius:12px;margin-bottom:16px}.notice b{color:#7a4b00}
+  .tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 14px}.tab{white-space:nowrap;border:1px solid var(--line);background:white;border-radius:999px;padding:9px 14px;font-weight:700;cursor:pointer;color:var(--muted)}.tab.active{background:var(--navy);color:white;border-color:var(--navy)}
+  .view{display:none}.view.active{display:block}
+  .grid{display:grid;gap:16px}.grid.cards{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}.grid.two{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px}.card h2,.card h3{margin-top:0}.sub{font-size:13px;color:var(--muted)}
+  .metric{display:flex;align-items:center;justify-content:space-between}.metric strong{font-size:28px}.metric span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+  .course-chip,.type-chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:800;color:white}.dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+  .event-list{display:flex;flex-direction:column;gap:10px}.event{border:1px solid var(--line);border-radius:12px;padding:11px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;background:#fff}.event .datebox{min-width:54px;text-align:center;border-radius:9px;background:#eef3f8;padding:7px}.datebox .m{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase}.datebox .d{font-size:22px;font-weight:900}.event h4{margin:0 0 3px;font-size:14px}.event p{margin:0;color:var(--muted);font-size:12px}.check{width:19px;height:19px;accent-color:var(--orange);margin-top:5px}.done{opacity:.45;text-decoration:line-through}
+  .day-grid{display:grid;grid-template-columns:repeat(5,minmax(210px,1fr));gap:12px;overflow:auto;padding-bottom:8px}.day{min-width:210px;background:white;border:1px solid var(--line);border-radius:15px;padding:14px}.day h3{margin:0 0 12px;display:flex;justify-content:space-between;align-items:center}.class-block{border-left:5px solid;background:#f8fafc;border-radius:9px;padding:10px;margin-bottom:9px}.class-block b{display:block}.class-block small{color:var(--muted)}
+  .calendar-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.calendar-head h2{margin:0}.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--line);border-top:1px solid var(--line);background:white;border-radius:14px;overflow:hidden}.cal-dow{background:#eef3f8;font-size:11px;text-align:center;padding:8px;font-weight:900;color:var(--muted);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.cal-day{min-height:112px;padding:7px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}.cal-day.other{background:#fafbfc;color:#a0adba}.cal-num{font-size:12px;font-weight:800;margin-bottom:5px}.cal-item{font-size:10px;padding:3px 5px;border-radius:5px;margin-bottom:3px;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default}.cal-day.today{outline:3px solid var(--orange);outline-offset:-3px}
+  .timeline{position:relative;margin-left:18px;padding-left:24px;border-left:3px solid #d9e3ee}.tl-item{position:relative;margin-bottom:16px}.tl-item:before{content:"";position:absolute;left:-33px;top:7px;width:14px;height:14px;border-radius:50%;background:white;border:4px solid var(--navy2)}.tl-item h4{margin:0 0 4px}.tl-item p{margin:0;color:var(--muted);font-size:13px}
+  .month-title{margin:22px 0 10px;font-size:20px;color:var(--navy)}
+  .route-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.route-day{border:1px solid var(--line);border-radius:9px;background:white;padding:8px 11px;cursor:pointer;font-weight:800}.route-day.active{background:var(--navy);color:white}.route{display:flex;align-items:stretch;gap:0;overflow:auto;padding:12px 0}.node{min-width:190px;background:white;border:1px solid var(--line);padding:14px;border-radius:14px;box-shadow:var(--shadow)}.node strong{display:block;margin:5px 0}.arrow{display:flex;align-items:center;padding:0 10px;font-size:25px;color:#8ba0b5}
+  .building-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:16px}.building{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}.building b{font-size:18px}.building p{margin:4px 0 0;color:var(--muted);font-size:12px}
+  .course-card{border-top:6px solid}.course-card ul{margin:10px 0 0 18px;padding:0}.course-card li{margin:6px 0;font-size:13px}.setup-row{display:flex;align-items:center;gap:8px;margin:7px 0}.setup-row input{width:17px;height:17px;accent-color:var(--orange)}
+  .settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}.field label{display:block;font-size:12px;font-weight:900;margin-bottom:5px;color:var(--muted);text-transform:uppercase}.field select,.field input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:white}
+  .add-task{display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:8px}.add-task input,.add-task select{padding:9px;border:1px solid var(--line);border-radius:9px}.tiny{font-size:11px;color:var(--muted)}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.legend span{display:inline-flex;gap:5px;align-items:center;font-size:11px}.legend i{width:9px;height:9px;border-radius:50%}
+  .footer{padding:26px 0;color:var(--muted);font-size:12px;text-align:center}
+  @media(max-width:800px){.hero{position:relative}.add-task{grid-template-columns:1fr}.cal-day{min-height:88px}.cal-item{font-size:9px}.card{padding:14px}}
+  @media print{.hero,.tabs,.hero-actions,.add-task,.route-controls{display:none!important}.view{display:block!important;break-before:page}.card{box-shadow:none}body{background:white}main{max-width:none}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="title"><h1>Fall 2026 Command Center</h1><p>UTSA Mechanical Engineering • schedule, deadlines, exams, route map & setup tracker</p></div>
+    <div class="hero-actions"><button class="btn primary" onclick="exportICS()">Export .ICS Calendar</button><button class="btn light" onclick="window.print()">Print / PDF</button><button class="btn ghost" onclick="resetProgress()">Reset Checkmarks</button></div>
+  </div>
+</header>
+<main>
+  <div class="notice"><b>Two things still need your confirmation:</b> ME 1403 has conflicting lecture times in the syllabus, so this dashboard defaults to the explicit “Lecture Times: MW 9:00–9:50 AM.” Your ME 1403 lab section is also unknown. Set both under <b>Settings</b> and the weekly schedule + exported calendar will update automatically.</div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-view="today">Today</button><button class="tab" data-view="week">Weekly Schedule</button><button class="tab" data-view="calendar">Calendar</button><button class="tab" data-view="roadmap">Semester Roadmap</button><button class="tab" data-view="route">Campus Route</button><button class="tab" data-view="courses">Courses & Setup</button><button class="tab" data-view="settings">Settings</button>
+  </nav>
+
+  <section class="view active" id="today">
+    <div class="grid cards" id="metrics"></div>
+    <div class="grid two" style="margin-top:16px">
+      <div class="card"><h2>Today</h2><div class="sub" id="todayDate"></div><div class="event-list" id="todayEvents" style="margin-top:12px"></div></div>
+      <div class="card"><h2>Due Soon</h2><div class="sub">Known syllabus deadlines in the next 10 days</div><div class="event-list" id="dueSoon" style="margin-top:12px"></div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h2>Add a custom task</h2><div class="sub">Use this for Canvas/Mastering dates that are not printed in the PDF syllabi. Saved only in your browser.</div><form class="add-task" id="taskForm" style="margin-top:10px"><input id="taskDate" type="date" required><select id="taskCourse"></select><input id="taskTitle" placeholder="e.g. Physics Mastering HW 2" required><button class="btn primary" type="submit">Add</button></form></div>
+  </section>
+
+  <section class="view" id="week"><div class="card"><div class="calendar-head"><div><h2>Weekly Class Schedule</h2><div class="sub">ME lab updates after you choose your lab section.</div></div></div><div class="day-grid" id="weeklyGrid"></div></div></section>
+
+  <section class="view" id="calendar"><div class="card"><div class="calendar-head"><button class="btn light" onclick="changeMonth(-1)">←</button><h2 id="calTitle"></h2><button class="btn light" onclick="changeMonth(1)">→</button></div><div class="legend" id="legend"></div><div class="cal-grid" id="calGrid"></div></div></section>
+
+  <section class="view" id="roadmap"><div class="card"><h2>Semester Roadmap</h2><div class="sub">Major known homework, labs, exams, project milestones, and university breaks. Tentative ME items are labeled.</div><div id="timeline"></div></div></section>
+
+  <section class="view" id="route"><div class="card"><h2>Campus Route Map</h2><div class="sub">This is a route-flow map, not a geographic campus map. It shows your building-to-building sequence for each day.</div><div class="route-controls" id="routeControls" style="margin-top:14px"></div><div class="route" id="routeFlow"></div><div class="building-grid" id="buildingGrid"></div></div></section>
+
+  <section class="view" id="courses"><div class="grid cards" id="courseCards"></div></section>
+
+  <section class="view" id="settings">
+    <div class="card"><h2>Schedule Settings</h2><div class="settings">
+      <div class="field"><label>ME 1403 lecture time</label><select id="meLecture"><option value="09:00-09:50">MW 9:00–9:50 AM (explicit lecture-time line)</option><option value="12:00-12:50">MW 12:00–12:50 PM (conflicting line)</option></select></div>
+      <div class="field"><label>ME 1403 lab section</label><select id="meLab"><option value="">Not set yet</option><option value="OL1">OL1 • MW 1:00–2:15 • AET 0.210.1</option><option value="OL2">OL2 • MW 5:30–6:45 • AET 0.210.1</option><option value="OL3">OL3 • TR 2:30–3:45 • AET 0.210.1</option><option value="OL4">OL4 • TR 11:30–12:45 • AET 0.210.1</option><option value="OL6">OL6 • F 10:00–12:45 • AET 0.210.1</option><option value="OL7">OL7 • TR 4:00–5:15 • AER 0.210.1</option><option value="OL8">OL8 • F 1:00–3:45 • AER 0.210.1</option><option value="OL9">OL9 • F 10:00–12:45 • AER 0.240</option></select></div>
+      <div class="field"><label>Physics II classroom</label><input id="physicsRoom" value="Check Canvas / ASAP" /></div>
+    </div><p class="tiny" style="margin-top:12px">Settings and checkmarks are saved in localStorage on this browser. Nothing is sent anywhere.</p></div>
+    <div class="card" style="margin-top:16px"><h2>Known syllabus gaps / warnings</h2><p class="sub">PHY 1963 has 16 MasteringPhysics assignments, but the PDF says the actual due dates live in Canvas. ME 1403 gives many lab/project deadlines only by week, not an exact day/time. Always let Canvas override this dashboard when there is a conflict.</p></div>
+  </section>
+  <div class="footer">Built from your Fall 2026 syllabi • Last generated Aug 26, 2026 • local/offline dashboard</div>
+</main>
+<script>
+const COURSES={
+ ME:{code:'ME 1403',name:'Engineering Practice & Graphics',color:'#f59e0b'},
+ STAT:{code:'EGR 2103',name:'Statics',color:'#2563eb'},
+ LIN:{code:'EGR 2302',name:'Linear Algebra',color:'#7c3aed'},
+ MULTI:{code:'EGR 2313',name:'Multivariable Calculus',color:'#0f9f8f'},
+ PHY:{code:'PHY 1963',name:'Physics II',color:'#dc3545'},
+ LAB:{code:'PHY 1971',name:'Physics II Lab',color:'#2e8b57'}
+};
+const BUILDINGS={
+ 'MH':{label:'MH',room:'varies',note:'ME 1403 lecture + Linear Algebra lecture + Multivariable Friday'},
+ 'BB':{label:'BB',room:'3.01.06',note:'Statics lecture'},
+ 'EB':{label:'EB',room:'2.04.06',note:'Multivariable TR lecture'},
+ 'FLN':{label:'FLN',room:'2.02.02',note:'Linear Algebra Friday'},
+ 'MS':{label:'MS',room:'3.02.14',note:'Physics II Lab'},
+ 'AET':{label:'AET',room:'0.210.1',note:'Several ME 1403 lab sections'},
+ 'AER':{label:'AER',room:'0.210.1 / 0.240',note:'Some ME 1403 lab sections'}
+};
+const meLabOptions={
+ OL1:{days:['MO','WE'],start:'13:00',end:'14:15',room:'AET 0.210.1'}, OL2:{days:['MO','WE'],start:'17:30',end:'18:45',room:'AET 0.210.1'},
+ OL3:{days:['TU','TH'],start:'14:30',end:'15:45',room:'AET 0.210.1'}, OL4:{days:['TU','TH'],start:'11:30',end:'12:45',room:'AET 0.210.1'},
+ OL6:{days:['FR'],start:'10:00',end:'12:45',room:'AET 0.210.1'}, OL7:{days:['TU','TH'],start:'16:00',end:'17:15',room:'AER 0.210.1'},
+ OL8:{days:['FR'],start:'13:00',end:'15:45',room:'AER 0.210.1'}, OL9:{days:['FR'],start:'10:00',end:'12:45',room:'AER 0.240'}
+};
+const recurringBase=[
+ {course:'LIN',days:['MO','WE'],start:'13:00',end:'13:50',room:'MH 2.01.44',title:'Linear Algebra'}, {course:'LIN',days:['FR'],start:'14:00',end:'14:50',room:'FLN 2.02.02',title:'Linear Algebra'},
+ {course:'PHY',days:['MO','WE'],start:'14:30',end:'15:45',room:'@PHYSROOM',title:'Physics II'}, {course:'LAB',days:['MO'],start:'16:00',end:'18:20',room:'MS 3.02.14',title:'Physics II Lab'},
+ {course:'STAT',days:['TU','TH'],start:'08:30',end:'09:45',room:'BB 3.01.06',title:'Statics'},
+ {course:'MULTI',days:['TU','TH'],start:'11:30',end:'12:45',room:'EB 2.04.06',title:'Multivariable Calculus'}, {course:'MULTI',days:['FR'],start:'15:00',end:'15:50',room:'MH 2.01.40',title:'Multivariable Recitation'}
+];
+const holidays=['2026-09-07','2026-10-12','2026-10-13','2026-11-25','2026-11-26','2026-11-27','2026-12-04'];
+const klesseCancel=['2026-11-24'];
+let events=[
+ // Linear Algebra homework + exams
+ ...[['2026-09-01','Problem Set A, Part 1'],['2026-09-08','Problem Set A, Part 2'],['2026-09-15','Problem Set A, Part 3'],['2026-09-22','Problem Set B, Part 1'],['2026-09-29','Problem Set B, Part 2'],['2026-10-06','Problem Set B, Part 3'],['2026-10-15','Problem Set C, Part 1'],['2026-10-20','Problem Set C, Part 2'],['2026-10-27','Problem Set C, Part 3'],['2026-11-03','Problem Set D, Part 1'],['2026-11-10','Problem Set D, Part 2'],['2026-11-17','Problem Set D, Part 3'],['2026-11-24','Problem Set E']].map(x=>({date:x[0],course:'LIN',type:'homework',title:x[1],time:'23:59'})),
+ ...[['2026-09-18','Midterm 1','14:00','14:50'],['2026-10-09','Midterm 2','14:00','14:50'],['2026-10-30','Midterm 3','14:00','14:50'],['2026-11-20','Midterm 4','14:00','14:50'],['2026-12-11','Comprehensive Final','07:00','08:50']].map(x=>({date:x[0],course:'LIN',type:'exam',title:x[1],time:x[2],end:x[3]})),
+ // Multivariable
+ ...[['2026-09-01','Homework 01 — Prerequisite Homework'],['2026-09-08','Problem Set A'],['2026-09-15','Problem Set B, Part 1'],['2026-09-22','Problem Set B, Part 2'],['2026-09-29','Problem Set B, Part 3'],['2026-10-06','Problem Set C, Part 1'],['2026-10-15','Problem Set C, Part 2'],['2026-10-20','Problem Set C, Part 3'],['2026-10-27','Problem Set D, Part 1'],['2026-11-03','Problem Set D, Part 2'],['2026-11-10','Problem Set D, Part 3'],['2026-11-17','Problem Set E, Part 1'],['2026-11-24','Problem Set E, Part 2']].map(x=>({date:x[0],course:'MULTI',type:'homework',title:x[1],time:'23:59'})),
+ ...[['2026-09-04','Prerequisite Exam','15:00','15:50'],['2026-09-11','Midterm 1','15:00','15:50'],['2026-10-02','Midterm 2','15:00','15:50'],['2026-10-23','Midterm 3','15:00','15:50'],['2026-11-13','Midterm 4','15:00','15:50'],['2026-12-10','Comprehensive Final','07:00','08:50']].map(x=>({date:x[0],course:'MULTI',type:'exam',title:x[1],time:x[2],end:x[3]})),
+ // Physics II
+ ...[['2026-09-21','Exam 1 — Ch. 17–20'],['2026-10-19','Exam 2 — Ch. 21–24'],['2026-11-23','Exam 3 — Ch. 25–28']].map(x=>({date:x[0],course:'PHY',type:'exam',title:x[1],time:'14:30',end:'15:40'})),
+ {date:'2026-12-09',course:'PHY',type:'exam',title:'Final Exam — Ch. 17–32',time:'13:05',end:'14:45'},
+ // Physics lab worksheets
+ ...[['2026-09-06','Electrostatic Charging Worksheet'],['2026-09-13','Electric Field Around a Conductor Worksheet'],['2026-09-20','Resistivity and Resistance Worksheet'],['2026-09-27',"Ohm's Law Worksheet"],['2026-10-04','Simple Circuits Worksheet'],['2026-10-11',"Kirchhoff's Rules Worksheet"],['2026-10-25','RC & LRC Circuits Worksheet'],['2026-11-01','Reflection and Refraction Worksheet'],['2026-11-08','Concave Mirrors Worksheet'],['2026-11-15','Thin Lenses Worksheet']].map(x=>({date:x[0],course:'LAB',type:'lab',title:x[1],time:'23:59'})),
+ // Statics homework / activities
+ ...[['2026-08-30','Ch. 1 + Ch. 2 + SmartBook overview + Connect orientation'],['2026-09-06','HW 2.1–2.5'],['2026-09-13','Ch. 3 + ALEKS dot product / trig review III / vectors'],['2026-09-20','HW 3.1–3.4 + Ch. 4'],['2026-09-27','HW 4.1–4.3'],['2026-10-04','Ch. 5'],['2026-10-11','HW 5.1–5.4 + Ch. 6'],['2026-10-18','HW 6.1–6.4'],['2026-10-25','Ch. 7'],['2026-11-01','HW 7.1–7.3 + HW 7.2 handwritten Gradescope submission'],['2026-11-08','Ch. 8 + HW 8.1'],['2026-11-15','HW 8.2–8.3'],['2026-11-22','Ch. 9'],['2026-11-29','HW 9a + HW 9b']].map(x=>({date:x[0],course:'STAT',type:'homework',title:x[1],time:'23:59'})),
+ ...[['2026-09-11','Exam 1 — Chapters 1–2'],['2026-10-02','Exam 2 — Chapters 3–4'],['2026-10-23','Exam 3 — Chapters 5–6'],['2026-11-20','Exam 4 — Chapters 7–8']].map(x=>({date:x[0],course:'STAT',type:'exam',title:x[1],time:'18:00',end:'19:15'})),
+ {date:'2026-12-10',course:'STAT',type:'exam',title:'Comprehensive Final',time:'15:00',end:'16:50'},
+ ...[['2026-09-04','Optional recitation — Sections 4–6 prerequisite'],['2026-09-25','Optional recitation — Sections 4–6, Ch. 2'],['2026-10-16','Optional recitation — Sections 4–6, Ch. 3–4'],['2026-11-06','Optional recitation — Sections 4–6, Ch. 5–6']].map(x=>({date:x[0],course:'STAT',type:'class',title:x[1],time:'18:00',end:'19:15'})),
+ // ME 1403 tentative week-based items, using week-end date as reminder
+ ...[['2026-08-28','ME Lab: HW 1 + Tutorials 2,3,4'],['2026-09-04','ME Lab: HW 2 + Tutorials 2,3'],['2026-09-11','ME Lab: HW 3 + Quiz 1 (Sketches, Ch. 2–3)'],['2026-09-18','ME Lab: First Midterm (tentative week)'],['2026-09-25','ME Lab: HW 4 + project teams + concept drawing'],['2026-10-02','ME Lab: HW 5 + Quiz 2 + Project Part 1'],['2026-10-16','ME Lab: HW 6 + Quiz 3 + Project Part 2'],['2026-10-23','ME Lab: Second Midterm + Project Part 3'],['2026-10-30','ME Lab: HW 7 + Project Part 4'],['2026-11-06','ME Lab: HW 8 + Quiz 4 + Project Part 5'],['2026-11-13','ME Lab: HW 9 + Blueprint/Draft'],['2026-11-20','ME Lab: HW 10 + Final Project Presentations'],['2026-12-04','ME Lab: Final Exam + Project Full Package']].map(x=>({date:x[0],course:'ME',type:'tentative',title:x[1],approx:true})),
+ {date:'2026-09-25',course:'ME',type:'tentative',title:'ME Lecture Quiz 1 — week of Sep 21–25',approx:true},
+ {date:'2026-10-09',course:'ME',type:'tentative',title:'ME Lecture Midterm 1 — week of Oct 5–9',approx:true},
+ {date:'2026-11-20',course:'ME',type:'tentative',title:'ME Lecture Midterm 2 — week of Nov 16–20',approx:true},
+ {date:'2026-12-11',course:'ME',type:'exam',title:'ME 1403 Lecture Final',time:'09:00',end:'10:50'},
+ // University dates
+ {date:'2026-09-07',course:null,type:'holiday',title:'Labor Day — University closed'}, {date:'2026-10-12',course:null,type:'holiday',title:'Fall Break — no classes'}, {date:'2026-10-13',course:null,type:'holiday',title:'Fall Break — no classes'}, {date:'2026-11-24',course:null,type:'holiday',title:'Klesse Tech Symposium — Klesse Main Campus classes canceled 8 AM–3 PM'}, {date:'2026-11-25',course:null,type:'holiday',title:'No classes'}, {date:'2026-11-26',course:null,type:'holiday',title:'Thanksgiving — University closed'}, {date:'2026-11-27',course:null,type:'holiday',title:'Thanksgiving — University closed'}, {date:'2026-12-04',course:null,type:'holiday',title:'Student Study Day — no classes'}
+];
+function loadCustom(){try{return JSON.parse(localStorage.getItem('fall26_custom')||'[]')}catch{return[]}}
+function allEvents(){return events.concat(loadCustom()).sort((a,b)=>a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||''))}
+function saveSetting(k,v){localStorage.setItem('fall26_'+k,v);renderAll()}
+function getSetting(k,def=''){return localStorage.getItem('fall26_'+k)||def}
+function courseColor(c){return c?COURSES[c].color:'#64748b'}
+function labelCourse(c){return c?COURSES[c].code:'UTSA'}
+function fmtDate(ds,opt={}){let d=new Date(ds+'T12:00:00');return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:opt.year?'numeric':undefined,weekday:opt.weekday?'short':undefined})}
+function time12(t){if(!t)return'';let [h,m]=t.split(':').map(Number);let ap=h>=12?'PM':'AM';h=((h+11)%12)+1;return `${h}:${String(m).padStart(2,'0')} ${ap}`}
+function isDone(e){return localStorage.getItem('done_'+eventKey(e))==='1'}
+function eventKey(e){return [e.date,e.course||'UTSA',e.title].join('|')}
+function toggleDone(e){let k='done_'+eventKey(e);localStorage.setItem(k,isDone(e)?'0':'1');renderAll()}
+function courseChip(c){let col=courseColor(c);return `<span class="course-chip" style="background:${col}">${labelCourse(c)}</span>`}
+function eventHTML(e,checkbox=true){let d=new Date(e.date+'T12:00:00'),mon=d.toLocaleString(undefined,{month:'short'}),day=d.getDate();let meta=[];if(e.time)meta.push(time12(e.time)+(e.end?'–'+time12(e.end):''));if(e.approx)meta.push('tentative / verify Canvas');
+ return `<div class="event ${isDone(e)?'done':''}"><div class="datebox"><div class="m">${mon}</div><div class="d">${day}</div></div><div><div style="margin-bottom:4px">${courseChip(e.course)}</div><h4>${e.title}</h4><p>${meta.join(' • ')||e.type}</p></div>${checkbox&&['homework','lab','tentative','custom'].includes(e.type)?`<input class="check" type="checkbox" ${isDone(e)?'checked':''} onchange='toggleDone(${JSON.stringify(e)})'>`:''}</div>`}
+function recurring(){let physRoom=getSetting('physicsRoom','Check Canvas / ASAP');let arr=recurringBase.map(x=>({...x,room:x.room==='@PHYSROOM'?physRoom:x.room}));let lec=getSetting('meLecture','09:00-09:50').split('-');arr.push({course:'ME',days:['MO','WE'],start:lec[0],end:lec[1],room:'MH 2.01.36',title:'ME 1403 Lecture'});let ls=getSetting('meLab','');if(ls&&meLabOptions[ls])arr.push({course:'ME',days:meLabOptions[ls].days,start:meLabOptions[ls].start,end:meLabOptions[ls].end,room:meLabOptions[ls].room,title:`ME 1403 Lab ${ls}`});return arr}
+const dayCodes=['MO','TU','WE','TH','FR'],dayNames=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+function renderWeek(){let arr=recurring();document.getElementById('weeklyGrid').innerHTML=dayCodes.map((d,i)=>{let ev=arr.filter(x=>x.days.includes(d)).sort((a,b)=>a.start.localeCompare(b.start)); if(d==='FR')ev.push({course:'STAT',start:'18:00',end:'19:15',room:'Check calendar',title:'Statics coordinated Friday block — only when scheduled'});ev.sort((a,b)=>a.start.localeCompare(b.start));return `<div class="day"><h3>${dayNames[i]}</h3>${ev.length?ev.map(x=>`<div class="class-block" style="border-color:${courseColor(x.course)}"><span class="course-chip" style="background:${courseColor(x.course)}">${labelCourse(x.course)}</span><b>${x.title}</b><small>${time12(x.start)}–${time12(x.end)}<br>${x.room}</small></div>`).join(''):'<span class="sub">No classes</span>'}</div>`}).join('')}
+function classEventsForDate(ds){let d=new Date(ds+'T12:00:00'),day=['SU','MO','TU','WE','TH','FR','SA'][d.getDay()];if(holidays.includes(ds))return[];return recurring().filter(x=>x.days.includes(day)).filter(x=>!(klesseCancel.includes(ds)&&['ME','STAT','LIN','MULTI'].includes(x.course))).map(x=>({date:ds,course:x.course,type:'class',title:x.title,time:x.start,end:x.end,room:x.room}))}
+function renderToday(){let now=new Date(),ds=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');document.getElementById('todayDate').textContent=now.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});let todays=classEventsForDate(ds).concat(allEvents().filter(e=>e.date===ds));document.getElementById('todayEvents').innerHTML=todays.length?todays.map(e=>eventHTML(e,false)).join(''):'<div class="sub">No known classes or syllabus deadlines today.</div>';
+ let end=new Date(now);end.setDate(end.getDate()+10);let upcoming=allEvents().filter(e=>{let x=new Date(e.date+'T12:00:00');return x>=new Date(ds+'T00:00:00')&&x<=end&&['homework','lab','exam','tentative','custom'].includes(e.type)}).slice(0,10);document.getElementById('dueSoon').innerHTML=upcoming.length?upcoming.map(e=>eventHTML(e)).join(''):'<div class="sub">Nothing known in the next 10 days.</div>';
+ let nextExam=allEvents().find(e=>e.type==='exam'&&new Date(e.date+'T23:59:00')>=now);let open=allEvents().filter(e=>['homework','lab','tentative','custom'].includes(e.type)&&!isDone(e)&&new Date(e.date+'T23:59:00')>=now).length;document.getElementById('metrics').innerHTML=`<div class="card metric"><div><span>Courses</span><strong>6</strong></div><div>📚</div></div><div class="card metric"><div><span>Open known tasks</span><strong>${open}</strong></div><div>✅</div></div><div class="card metric"><div><span>Next exam</span><strong style="font-size:18px">${nextExam?fmtDate(nextExam.date):'—'}</strong><div class="sub">${nextExam?labelCourse(nextExam.course)+' • '+nextExam.title:''}</div></div><div>🧠</div></div><div class="card metric"><div><span>ME lab</span><strong style="font-size:18px">${getSetting('meLab','')||'TBD'}</strong></div><div>🛠️</div></div>`}
+let calMonth=new Date(2026,7,1);
+function changeMonth(n){calMonth.setMonth(calMonth.getMonth()+n);if(calMonth<new Date(2026,7,1))calMonth=new Date(2026,7,1);if(calMonth>new Date(2026,11,1))calMonth=new Date(2026,11,1);renderCalendar()}
+function renderCalendar(){let y=calMonth.getFullYear(),m=calMonth.getMonth();document.getElementById('calTitle').textContent=calMonth.toLocaleDateString(undefined,{month:'long',year:'numeric'});let first=new Date(y,m,1),last=new Date(y,m+1,0),start=new Date(y,m,1-first.getDay());let cells=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(x=>`<div class="cal-dow">${x}</div>`);let today=new Date();for(let i=0;i<42;i++){let d=new Date(start);d.setDate(start.getDate()+i);let ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;let ev=allEvents().filter(e=>e.date===ds);let cls=classEventsForDate(ds);let all=ev.concat(cls.filter(c=>!ev.some(e=>e.type==='exam'&&e.course===c.course&&e.date===c.date)));let other=d.getMonth()!==m?'other':'';let ist=d.toDateString()===today.toDateString()?'today':'';cells.push(`<div class="cal-day ${other} ${ist}"><div class="cal-num">${d.getDate()}</div>${all.slice(0,5).map(e=>`<div class="cal-item" style="background:${courseColor(e.course)}" title="${labelCourse(e.course)} — ${e.title}">${e.time?time12(e.time)+' ':''}${e.title}</div>`).join('')}${all.length>5?`<div class="tiny">+${all.length-5} more</div>`:''}</div>`)}document.getElementById('calGrid').innerHTML=cells.join('')}
+function renderLegend(){document.getElementById('legend').innerHTML=Object.entries(COURSES).map(([k,c])=>`<span><i style="background:${c.color}"></i>${c.code}</span>`).join('')}
+function renderTimeline(){let grouped={};allEvents().filter(e=>['homework','lab','exam','tentative','holiday','custom'].includes(e.type)).forEach(e=>{let k=e.date.slice(0,7);(grouped[k]??=[]).push(e)});document.getElementById('timeline').innerHTML=Object.keys(grouped).sort().map(k=>{let [y,m]=k.split('-').map(Number),title=new Date(y,m-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'});return `<h3 class="month-title">${title}</h3><div class="timeline">${grouped[k].map(e=>`<div class="tl-item"><div>${courseChip(e.course)} <span class="tiny">${fmtDate(e.date,{weekday:true})}${e.time?' • '+time12(e.time):''}${e.approx?' • tentative':''}</span></div><h4>${e.title}</h4><p>${e.type==='holiday'?'University calendar item':e.type}</p></div>`).join('')}</div>`}).join('')}
+let routeDay='MO';
+function renderRoute(){document.getElementById('routeControls').innerHTML=dayCodes.map((d,i)=>`<button class="route-day ${routeDay===d?'active':''}" onclick="routeDay='${d}';renderRoute()">${dayNames[i]}</button>`).join('');let ev=recurring().filter(x=>x.days.includes(routeDay)).sort((a,b)=>a.start.localeCompare(b.start));if(routeDay==='FR')ev.push({course:'STAT',start:'18:00',end:'19:15',room:'Check calendar',title:'Statics coordinated block (scheduled Fridays only)'});ev.sort((a,b)=>a.start.localeCompare(b.start));document.getElementById('routeFlow').innerHTML=ev.length?ev.map((x,i)=>`${i?'<div class="arrow">→</div>':''}<div class="node" style="border-top:5px solid ${courseColor(x.course)}">${courseChip(x.course)}<strong>${x.title}</strong><div>${time12(x.start)}–${time12(x.end)}</div><div class="sub">${x.room}</div></div>`).join(''):'<div class="sub">No scheduled classes.</div>';document.getElementById('buildingGrid').innerHTML=Object.values(BUILDINGS).map(b=>`<div class="building"><b>${b.label}</b><p>${b.note}</p></div>`).join('')}
+const courseInfo={
+ ME:{grade:'40% lecture / 60% lab',setup:[['SolidWorks working',false],['iClicker ready',false],['Required textbook checked/purchased',false],['ME lab section confirmed',false]],notes:['Attendance mandatory for lecture and lab','Late Canvas assignments: zero','Lab/project dates are often week-based — verify Canvas']},
+ STAT:{grade:'Exams 90% + Homework 10% (+ up to 3 bonus)',setup:[['Connect + ALEKS access',true],['Textbook/access',true],['FE-approved calculator',false],['Gradescope ready',false]],notes:['TR 8:30–9:45, BB 3.01.06','Friday 6–7:15 block only when your section is scheduled','Homework normally Sunday 11:59 PM']},
+ LIN:{grade:'HW 15% • Midterms 68% • Final 17%',setup:[['Gradescope ready',false],['Textbook purchase needed',true]],notes:['No textbook purchase required; listed texts are optional','No calculators/electronics on exams','MW 1:00–1:50 + F 2:00–2:50']},
+ MULTI:{grade:'HW 15% • Prereq 5% • Midterms 64% • Final 16%',setup:[['OpenStax Calculus Vol. 3 bookmarked',false],['Gradescope ready',false],['iClicker ready',false]],notes:['Required OpenStax text is free','No calculators/electronics on exams','TR 11:30–12:45 + F 3:00–3:50']},
+ PHY:{grade:'HW 20% • 3 exams 45% • Final 21% • Quizzes 14%',setup:[['MasteringPhysics + eText',true],['iClicker ready',false]],notes:['16 homework assignments — exact due dates are in Canvas/Mastering','Quizzes nearly every class','MW 2:30–3:45']},
+ LAB:{grade:'Worksheets 80% • Quizzes 20%',setup:[['Calculator',false],['Metric ruler',false],['Graph paper',false],['Protractor',false],['USB drive',false],['Closed-toe shoes',false]],notes:['Monday 4:00–6:20, MS 3.02.14','15+ minutes late = absent','No AI allowed for course work']}
+};
+function setupKey(c,i){return `setup_${c}_${i}`}
+function renderCourses(){document.getElementById('courseCards').innerHTML=Object.entries(COURSES).map(([k,c])=>{let info=courseInfo[k];return `<div class="card course-card" style="border-top-color:${c.color}"><div>${courseChip(k)}</div><h3 style="margin:9px 0 3px">${c.name}</h3><div class="sub">${info.grade}</div><div style="margin-top:12px;font-weight:800">Setup</div>${info.setup.map((s,i)=>{let saved=localStorage.getItem(setupKey(k,i));let checked=saved===null?s[1]:saved==='1';return `<label class="setup-row"><input type="checkbox" ${checked?'checked':''} onchange="localStorage.setItem('${setupKey(k,i)}',this.checked?'1':'0')"><span>${s[0]}</span></label>`}).join('')}<div style="margin-top:12px;font-weight:800">Watch-outs</div><ul>${info.notes.map(n=>`<li>${n}</li>`).join('')}</ul></div>`}).join('')}
+function renderSettings(){document.getElementById('meLecture').value=getSetting('meLecture','09:00-09:50');document.getElementById('meLab').value=getSetting('meLab','');document.getElementById('physicsRoom').value=getSetting('physicsRoom','Check Canvas / ASAP')}
+function renderAll(){renderSettings();renderWeek();renderToday();renderCalendar();renderLegend();renderTimeline();renderRoute();renderCourses()}
+// tabs
+[...document.querySelectorAll('.tab')].forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById(t.dataset.view).classList.add('active')}));
+document.getElementById('meLecture').addEventListener('change',e=>saveSetting('meLecture',e.target.value));document.getElementById('meLab').addEventListener('change',e=>saveSetting('meLab',e.target.value));document.getElementById('physicsRoom').addEventListener('change',e=>saveSetting('physicsRoom',e.target.value));
+Object.entries(COURSES).forEach(([k,c])=>document.getElementById('taskCourse').insertAdjacentHTML('beforeend',`<option value="${k}">${c.code}</option>`));
+document.getElementById('taskForm').addEventListener('submit',e=>{e.preventDefault();let c=loadCustom();c.push({date:taskDate.value,course:taskCourse.value,type:'custom',title:taskTitle.value,time:'23:59'});localStorage.setItem('fall26_custom',JSON.stringify(c));taskTitle.value='';renderAll()});
+function resetProgress(){if(confirm('Clear deadline checkmarks and setup checkboxes? Your custom tasks and schedule settings will stay.')){Object.keys(localStorage).filter(k=>k.startsWith('done_')||k.startsWith('setup_')).forEach(k=>localStorage.removeItem(k));renderAll()}}
+function icsDate(ds,t){return ds.replaceAll('-','')+'T'+(t||'09:00').replace(':','')+'00'}
+function icsEscape(s){return String(s).replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;')}
+function exportICS(){let lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Fall 2026 Command Center//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+ // Recurring classes
+ recurring().forEach((r,i)=>{let firstMap={MO:'2026-08-24',TU:'2026-08-25',WE:'2026-08-26',TH:'2026-08-27',FR:'2026-08-28'};let startDay=r.days[0],start=firstMap[startDay];let by=r.days.join(',');let ex=[];holidays.concat(klesseCancel).forEach(ds=>{let d=new Date(ds+'T12:00:00'),code=['SU','MO','TU','WE','TH','FR','SA'][d.getDay()];if(r.days.includes(code)&&!(klesseCancel.includes(ds)&&!['ME','STAT','LIN','MULTI'].includes(r.course)))ex.push(icsDate(ds,r.start))});lines.push('BEGIN:VEVENT',`UID:class-${i}@fall26.local`,`DTSTART:${icsDate(start,r.start)}`,`DTEND:${icsDate(start,r.end)}`,`RRULE:FREQ=WEEKLY;BYDAY=${by};UNTIL=20261203T235900`,...(ex.length?[`EXDATE:${ex.join(',')}`]:[]),`SUMMARY:${icsEscape(COURSES[r.course].code+' '+r.title)}`,`LOCATION:${icsEscape(r.room)}`,'END:VEVENT')});
+ allEvents().filter(e=>['exam','homework','lab','custom'].includes(e.type)).forEach((e,i)=>{let st=e.time||'23:00',en=e.end|| (st==='23:59'?'23:59':st);lines.push('BEGIN:VEVENT',`UID:event-${i}-${e.date}@fall26.local`,`DTSTART:${icsDate(e.date,st)}`,`DTEND:${icsDate(e.date,en)}`,`SUMMARY:${icsEscape(labelCourse(e.course)+' — '+e.title)}`,`DESCRIPTION:${icsEscape(e.type+(e.approx?' (tentative; verify Canvas)':''))}`,'END:VEVENT')});
+ lines.push('END:VCALENDAR');let blob=new Blob([lines.join('\r\n')],{type:'text/calendar;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Fall_2026_UTSA_Master_Calendar.ics';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+renderAll();
+</script>
+</body>
+</html>
